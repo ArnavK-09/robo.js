@@ -1,5 +1,12 @@
 # create-robo
 
+## 0.7.3
+
+### Patch Changes
+
+- e95eb3d: patch: updated plugin development guide
+- 32e58ec: patch(create-robo): Fixed NODE_OPTIONS for Windows
+
 ## 0.7.2
 
 ### Patch Changes
