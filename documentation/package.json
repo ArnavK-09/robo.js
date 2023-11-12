@@ -1,7 +1,7 @@
 {
 	"name": "robo.js-documentation",
 	"version": "0.0.0",
-	"description": "",
+	"description": "🤖 Documentation for Robo.ns",
 	"scripts": {
 		"dev": "next",
 		"build": "next build",
@@ -10,7 +10,7 @@
 		"fmt": "npx prettier -w ."
 	},
 	"keywords": [],
-	"author": "",
+	"author": "Arnav K <arnavkaushal09@gmail.com>",
 	"license": "ISC",
 	"dependencies": {
 		"next": "^14.0.2",
