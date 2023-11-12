@@ -1,0 +1,24 @@
+{
+	"index": "Getting Started",
+	"adding-to-server": "Adding to Discord Servers",
+	"migrating": "Migrate To Robo.js",
+	"-- Robo.js": {
+		"type": "separator",
+		"title": "Robo.js"
+	},
+	"basics": "Basics for Beginner",
+	"advanced": "Advance for Intermediate",
+	"-- More": {
+		"type": "separator",
+		"title": "More"
+	},
+	"hosting-link": {
+		"title": "Deploy Your Robo",
+		"href": "/hosting"
+	},
+	"github-link": {
+		"title": "Our Roadmap ↗",
+		"href": "https://nextjs.org?utm_source=nextra.site&utm_medium=referral&utm_campaign=sidebar",
+		"newWindow": true
+	}
+}

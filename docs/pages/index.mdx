@@ -1,0 +1,33 @@
+---
+title: Hello from Robo.js 🤖
+---
+
+{/* imports */}
+import Hero from "@components/Hero"
+import Features from "@components/Features"
+import Why from "@components/Why"
+import { useData } from 'nextra/data'
+
+{/* ssg */}
+export const getStaticProps = () => {
+return fetch(`https://api.github.com/repos/Wave-play/robo.js`)
+.then(res => res.json())
+.then(repo => ({
+props: {
+ssg: {
+stars: repo.stargazers_count
+}
+},
+revalidate: 60
+}))
+}
+
+export const HeroWithStars = () => {
+  // Get the data from SSG, and render it as a component.
+  const { stars } = useData()
+  return <Hero stars={stars} />
+}
+ 
+<HeroWithStars />
+<Features />
+<Why />

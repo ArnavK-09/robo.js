@@ -1,0 +1,27 @@
+{
+	"index": {
+		"type": "page",
+		"display": "hidden",
+		"theme": {
+			"layout": "raw"
+		}
+	},
+	"docs": {
+		"type": "page",
+		"title": "Documentation"
+	},
+	"plugins": {
+		"type": "page",
+		"title": "Plugins",
+		"theme": {
+			"typesetting": "article"
+		}
+	},
+	"hosting": {
+		"type": "page",
+		"title": "Hosting",
+		"theme": {
+			"typesetting": "article"
+		}
+	}
+}
