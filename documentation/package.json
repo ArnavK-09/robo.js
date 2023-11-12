@@ -1,15 +1,14 @@
 {
 	"name": "robo.js-documentation",
 	"version": "0.0.0",
-	"description": "🤖 Documentation for Robo.ns",
+	"description": "🤖 Documentation for Robo.js",
 	"scripts": {
 		"dev": "next",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
 		"fmt": "npx prettier -w ."
-	},
-	"keywords": [],
+	}
 	"author": "Arnav K <arnavkaushal09@gmail.com>",
 	"license": "ISC",
 	"dependencies": {
