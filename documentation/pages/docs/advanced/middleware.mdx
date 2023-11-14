@@ -49,7 +49,7 @@ export default function (data) {
 
 Middleware can be a gatekeeper, deciding if an event or command should proceed. If a middleware function returns `{ abort: true }`, the event or command execution is halted. Here's an example:
 
-```js showLineNumbers {7} /abort/
+```js showLineNumbers {7} /abort/ filename="/src/middleware/02-example.middleware.js"
 import { isModuleEnabled } from './utils.js'
 
 export default async function (data) {
@@ -65,7 +65,7 @@ export default async function (data) {
 
 This ability can be leveraged for user roles-based access control:
 
-```js showLineNumbers {5-8} filename="/src/middleware/02-admin.middleware.js"
+```js showLineNumbers {5-8} filename="/src/middleware/03-admin.middleware.js"
 export default function (data) {
 	const [interaction] = data.payload
 	const userRoles = interaction.member.roles.cache.map((role) => role.name)
