@@ -8,9 +8,9 @@
 		"start": "next start",
 		"lint": "next lint",
 		"fmt": "npx prettier -w ."
-	}
+	},
 	"author": "Arnav K <arnavkaushal09@gmail.com>",
-	"license": "ISC",
+	"license": "MIT",
 	"dependencies": {
 		"next": "^14.0.2",
 		"nextra": "^2.13.2",
