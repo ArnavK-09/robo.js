@@ -1,5 +1,5 @@
 {
-	"name": "robo.js",
+	"name": "testbot",
 	"description": "",
 	"version": "1.0.0",
 	"type": "module",
@@ -8,9 +8,9 @@
 		"bot",
 		"discord",
 		"discord.js",
-		"javascript",
 		"robo",
-		"robo.js"
+		"robo.js",
+		"typescript"
 	],
 	"scripts": {
 		"build": "robo build",
@@ -23,10 +23,15 @@
 		"upgrade": "sage upgrade"
 	},
 	"dependencies": {
-		"discord.js": "latest",
-		"robo.js": "latest"
+		"@f/your-awesome-robo-plugin": "file:../your-awesome-robo-plugin",
+		"discord.js": "^14.16.3",
+		"robo.js": "^0.10.20",
+		"your-awesome-robo-plugin": "file:../your-awesome-robo-plugin"
 	},
 	"devDependencies": {
-		"prettier": "latest"
+		"@swc/core": "^1.7.35",
+		"@types/node": "^22.7.5",
+		"prettier": "^3.3.3",
+		"typescript": "^5.6.3"
 	}
 }

@@ -73,6 +73,15 @@ export async function addAction(packages: string[], options: AddCommandOptions) 
 					return prefix === ':' ? pkg.indexOf(prefix) === 1 : pkg.startsWith(prefix)
 				})
 
+                const schemaFilePath = path.join(pkg, '/.robo/build/schema.d.ts'); 
+                if (await fs.stat(schemaFilePath).then(() => true).catch(() => false)) {
+                    console.log(`Schema file found for ${pkg}`);
+					import('../../../../../../../')
+                    				// const tst = await import(schemaFilePath)
+				console.log(77777, `${pkg}/`)
+                    console.log(3423, schemaFilePath)
+                }
+
 				if (isLocal) {
 					const packageJsonPath = path.join(pkg, 'package.json')
 					const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'))

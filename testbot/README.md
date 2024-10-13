@@ -2,7 +2,7 @@
 
 ---
 
-# Hiya, robo.js 🌈
+# Hiya, testbot 🌈
 
 Welcome to your fresh **[Robo.js](https://github.com/Wave-Play/robo)** project!
 

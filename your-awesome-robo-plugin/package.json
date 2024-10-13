@@ -1,0 +1,53 @@
+{
+	"name": "your-awesome-robo-plugin",
+	"description": "",
+	"version": "1.0.0",
+	"type": "module",
+	"private": false,
+	"keywords": [
+		"bot",
+		"discord",
+		"discord.js",
+		"robo",
+		"robo.js",
+		"typescript"
+	],
+	"main": ".robo/build/index.js",
+	"license": "MIT",
+	"author": "Your Name <email>",
+	"contributors": [
+		"Your Name <email>"
+	],
+	"files": [
+		".robo/",
+		"src/",
+		"LICENSE",
+		"README.md"
+	],
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"scripts": {
+		"build": "robo build plugin",
+		"dev": "robo build plugin --watch",
+		"lint:style": "prettier --write .",
+		"prepublishOnly": "robo build plugin"
+	},
+	"devDependencies": {
+		"@swc/core": "^1.7.35",
+		"@types/node": "^22.7.5",
+		"discord.js": "^14.16.3",
+		"prettier": "^3.3.3",
+		"robo.js": "^0.10.20",
+		"typescript": "^5.6.3"
+	},
+	"peerDependencies": {
+		"robo.js": "^0.10.1"
+	},
+	"peerDependenciesMeta": {
+		"robo.js": {
+			"optional": false
+		}
+	}
+}
