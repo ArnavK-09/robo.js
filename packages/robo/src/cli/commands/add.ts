@@ -116,11 +116,23 @@ export async function addAction(packages: string[], options: AddCommandOptions) 
 			if (!options.force) {
 				return
 			}
-		}
+		} 
 	}
 
 	// Register plugins by adding them to the config
-	await Promise.all(pendingRegistration.map((pkg) => createPluginConfig(pkg, {})))
+	await Promise.all(
+		pendingRegistration.map(async (pkg) => {
+			const schemaFilePath = path.join(process.cwd(), 'node_modules', pkg, '.robo', 'build', 'schema.d.ts')
+			try {
+				await fs.access(schemaFilePath)
+				logger.debug(`Schema found for ${pkg} at ${schemaFilePath}`)
+				createPluginConfig(pkg,{},  true)
+			} catch (error) {
+				logger.debug(`No schema found for ${pkg}`)
+				createPluginConfig(pkg, {})
+			}
+		})
+	)
 
 	// Update spinner with registered plugins
 	spinner.setText(
@@ -201,15 +213,17 @@ export async function addAction(packages: string[], options: AddCommandOptions) 
  * @param pluginName The name of the plugin (e.g. @roboplay/plugin-ai)
  * @param config The plugin config
  */
-async function createPluginConfig(pluginName: string, config: Record<string, unknown>) {
+async function createPluginConfig(pluginName: string, config: Record<string, unknown>, isPluginHavingSchema: boolean = false) {
 	// Split plugin name into parts to create parent directories
 	const pluginParts = pluginName.replace(/^@/, '').split('/')
 
+	// JS doc for plugin schema 
+	const schemaDoc = `// @ts-check\n\n/**\n * @type {import('${pluginName}/.robo/build/schema.d.ts').default}\n **/\n`;
+	
 	// Make sure the directory exists
 	await fs.mkdir(path.join(process.cwd(), 'config', 'plugins'), {
 		recursive: true
 	})
-
 	// Create parent directory if this is a scoped plugin
 	if (pluginName.startsWith('@')) {
 		await fs.mkdir(path.join(process.cwd(), 'config', 'plugins', pluginParts[0]), {
@@ -222,5 +236,5 @@ async function createPluginConfig(pluginName: string, config: Record<string, unk
 	const pluginConfig = JSON.stringify(config) + '\n'
 
 	logger.debug(`Writing ${pluginName} config to ${pluginPath}...`)
-	await fs.writeFile(pluginPath, `export default ${pluginConfig}`)
+	await fs.writeFile(pluginPath, `${isPluginHavingSchema ? schemaDoc : ''}export default ${pluginConfig}`)
 }
