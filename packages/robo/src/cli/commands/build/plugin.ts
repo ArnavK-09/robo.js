@@ -12,6 +12,7 @@ import { loadConfig, loadConfigPath } from '../../../core/config.js'
 import { hasProperties } from '../../utils/utils.js'
 import Watcher from '../../utils/watcher.js'
 import { buildPublicDirectory } from '../../utils/public.js'
+import { SchemaField } from 'src/core/schema.js'
 
 const command = new Command('plugin')
 	.description('Builds your plugin for distribution.')
@@ -30,6 +31,49 @@ interface PluginCommandOptions {
 	silent?: boolean
 	verbose?: boolean
 	watch?: boolean
+}
+
+export function generateTypeDefinition(schema: Record<string, SchemaField>, indent = 2): string {
+	const indentation = '  '.repeat(indent)
+	let typeDef = ''
+
+	// Iterate through the entries of the schema
+	for (const [key, value] of Object.entries(schema)) {
+		if (value.type === 'object' && value.properties) {
+			typeDef += `${indentation}${key}: {\n`
+			typeDef += generateTypeDefinition(value.properties, indent + 1)
+			typeDef += `${indentation}};\n`
+		} else {
+			const optional = value.required === false || value.default !== undefined ? '?' : ''
+
+			typeDef += `${indentation}${key}${optional}: ${schemaToTypeString(value)}`
+
+			if (value.min !== undefined) {
+				typeDef += ` /* min: ${value.min} */`
+			}
+			if (value.max !== undefined) {
+				typeDef += ` /* max: ${value.max} */`
+			}
+			typeDef += ';\n'
+		}
+	}
+
+	return typeDef
+}
+
+function schemaToTypeString(schema: SchemaField): string {
+	switch (schema.type) {
+		case 'string':
+			return 'string'
+		case 'number':
+			return 'number'
+		case 'boolean':
+			return 'boolean'
+		case 'array':
+			return `${schemaToTypeString({ type: schema.items?.type || 'any' })}[]`
+		default:
+			return 'any'
+	}
 }
 
 async function pluginAction(_args: string[], options: PluginCommandOptions) {
@@ -77,6 +121,20 @@ async function pluginAction(_args: string[], options: PluginCommandOptions) {
 	const manifestTime = Date.now()
 	const manifest = await generateManifest({ commands: {}, context: {}, events: {} }, 'plugin')
 	logger.debug(`Generated manifest in ${Date.now() - manifestTime}ms`)
+
+	try {
+		const configPath = path.join(process.cwd(), '.robo', 'build', 'robo', 'config.js')
+		const configModule = await import(configPath)
+		const schema = configModule.default
+		const typeDefinition = `export interface Config {\n${generateTypeDefinition(schema)}}\n`
+
+		const configDtsPath = path.join(process.cwd(), '.robo', 'build', 'config.d.ts')
+		await fs.writeFile(configDtsPath, typeDefinition)
+
+		logger.info(`Generated config.d.ts successfully`)
+	} catch (error) {
+		logger.error(`Failed to generate config.d.ts:`, error)
+	}
 
 	if (!options.dev) {
 		// Build /public for production if available
