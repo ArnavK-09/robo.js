@@ -1,9 +1,9 @@
 import { Buttons, ID_NAMESPACE } from '../../core/constants.js'
 import { getSettings } from '../../core/settings.js'
 import { hasPermission, logAction } from '../../core/utils.js'
-import { Flashcore, logger } from '@roboplay/robo.js'
+import { Flashcore, logger } from 'robo.js'
 import { ButtonStyle, Colors, ComponentType } from 'discord.js'
-import type { EventConfig } from '@roboplay/robo.js'
+import type { EventConfig } from 'robo.js'
 import type { ButtonInteraction } from 'discord.js'
 
 export const config: EventConfig = {
@@ -37,12 +37,16 @@ export default async (interaction: ButtonInteraction) => {
 	// Do the actual ban - Farewell forever!
 	const parts = interaction.customId.split('/')
 	const userId = parts[parts.length - 1]
-	
+
 	if (!testMode) {
 		await interaction.guild.members.ban(userId)
-		await Flashcore.set('ban', {}, {
-			namespace: ID_NAMESPACE + interaction.guildId + userId
-		})
+		await Flashcore.set(
+			'ban',
+			{},
+			{
+				namespace: ID_NAMESPACE + interaction.guildId + userId
+			}
+		)
 		logger.info(`Banned <@${userId}> in guild ${interaction.guild.name} by @${interaction.user.username}`)
 	}
 

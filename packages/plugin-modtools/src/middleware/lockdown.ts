@@ -1,7 +1,7 @@
 import { hasPermission } from '../core/utils.js'
 import { getSettings } from '../core/settings.js'
-import { logger } from '@roboplay/robo.js'
-import type { MiddlewareData, MiddlewareResult } from '@roboplay/robo.js'
+import { logger } from 'robo.js'
+import type { MiddlewareData, MiddlewareResult } from 'robo.js'
 import type { ChatInputCommandInteraction } from 'discord.js'
 
 interface LockdownData {
@@ -9,8 +9,8 @@ interface LockdownData {
 }
 
 export default async (data: MiddlewareData): Promise<MiddlewareResult | void> => {
-	const {  key, plugin, type } = data.record
-	const isSelfPlugin = plugin?.name === '@roboplay/plugin-modtools'
+	const { key, plugin, type } = data.record
+	const isSelfPlugin = plugin?.name === '@robojs/moderation'
 
 	// Only lock down commands
 	if (type !== 'command') {
@@ -40,7 +40,6 @@ export default async (data: MiddlewareData): Promise<MiddlewareResult | void> =>
 		return { abort: true }
 	}
 }
-
 
 export function getLockdown(guildId: string): LockdownData {
 	const settings = getSettings(guildId)

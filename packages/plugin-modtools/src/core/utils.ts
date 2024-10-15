@@ -1,6 +1,6 @@
 import { Modals, TextInputs } from './constants.js'
 import { getSettings } from './settings.js'
-import { client, logger, setState } from '@roboplay/robo.js'
+import { client, logger, setState } from 'robo.js'
 import { ChannelType, ComponentType, TextInputStyle } from 'discord.js'
 import type {
 	MessageCreateOptions,
@@ -132,10 +132,17 @@ export async function isBanned(guild: Guild, userId: string): Promise<boolean> {
 	}
 }
 
-export async function showConfirmation(interaction: ChatInputCommandInteraction, callback: (interaction: ModalSubmitInteraction) => Promise<void> | void) {
-	setState('modal-confirm', {callback}, {
-		namespace: interaction.guildId + interaction.user.id
-	})
+export async function showConfirmation(
+	interaction: ChatInputCommandInteraction,
+	callback: (interaction: ModalSubmitInteraction) => Promise<void> | void
+) {
+	setState(
+		'modal-confirm',
+		{ callback },
+		{
+			namespace: interaction.guildId + interaction.user.id
+		}
+	)
 	console.log(`Setting namespace:`, interaction.guildId + interaction.user.id)
 
 	await interaction.showModal({

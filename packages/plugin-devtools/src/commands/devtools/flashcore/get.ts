@@ -1,7 +1,7 @@
 import { logger } from '../../../core/helpers.js'
-import { Flashcore } from '@roboplay/robo.js'
+import { Flashcore } from 'robo.js'
 import { Colors } from 'discord.js'
-import type { CommandConfig, CommandResult } from '@roboplay/robo.js'
+import type { CommandConfig, CommandResult } from 'robo.js'
 import type { CommandInteraction } from 'discord.js'
 
 export const config: CommandConfig = {
@@ -27,7 +27,12 @@ export default async (interaction: CommandInteraction): Promise<CommandResult> =
 	const value = await Flashcore.get(key, { namespace })
 
 	// Log the result
-	logger.custom('dev', `Flashcore.get(${key}):`, value, `- Time: ${Date.now() - start}ms - Namespace: ${namespace} - Type: ${typeof value}`)
+	logger.custom(
+		'dev',
+		`Flashcore.get(${key}):`,
+		value,
+		`- Time: ${Date.now() - start}ms - Namespace: ${namespace} - Type: ${typeof value}`
+	)
 
 	// Render as fancy embed
 	return {

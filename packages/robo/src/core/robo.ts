@@ -1,9 +1,10 @@
 import { color } from './color.js'
 import { registerProcessEvents } from './process.js'
+import { Compiler } from './../cli/utils/compiler.js'
 import { Client, Collection, Events } from 'discord.js'
 import { getConfig, loadConfig } from './config.js'
+import { FLASHCORE_KEYS, discordLogger } from './constants.js'
 import { logger } from './logger.js'
-import { loadManifest } from '../cli/utils/manifest.js'
 import { env } from './env.js'
 import {
 	executeAutocompleteHandler,
@@ -11,11 +12,13 @@ import {
 	executeContextHandler,
 	executeEventHandler
 } from './handlers.js'
-import { hasProperties } from '../cli/utils/utils.js'
-import { prepareFlashcore } from './flashcore.js'
+import { hasProperties, PackageDir } from '../cli/utils/utils.js'
+import { Flashcore, prepareFlashcore } from './flashcore.js'
+import { loadState } from './state.js'
 import Portal from './portal.js'
+import path from 'node:path'
 import { isMainThread, parentPort } from 'node:worker_threads'
-import type { PluginData } from '../types/index.js'
+import type { HandlerRecord, PluginData } from '../types/index.js'
 import type { AutocompleteInteraction, CommandInteraction } from 'discord.js'
 
 export const Robo = { restart, start, stop }
@@ -24,18 +27,19 @@ export const Robo = { restart, start, stop }
 export let client: Client
 
 // A Portal is exported with each Robo to allow for dynamic controls
-export let portal: Portal
+export const portal = new Portal()
 
 // Be careful, plugins may contain sensitive data in their config
 let plugins: Collection<string, PluginData>
 
 interface StartOptions {
 	client?: Client
+	shard?: string | boolean
 	stateLoad?: Promise<void>
 }
 
 async function start(options?: StartOptions) {
-	const { client: optionsClient, stateLoad } = options ?? {}
+	const { client: optionsClient, shard, stateLoad } = options ?? {}
 
 	// Important! Register process events before doing anything else
 	// This ensures the "ready" signal is sent to the parent process
@@ -43,67 +47,99 @@ async function start(options?: StartOptions) {
 
 	// Load config and manifest up next!
 	// This makes them available globally via getConfig() and getManifest()
-	const [config] = await Promise.all([loadConfig(), loadManifest()])
+	const [config] = await Promise.all([loadConfig(), Compiler.useManifest()])
 	logger({
 		drain: config?.logger?.drain,
 		enabled: config?.logger?.enabled,
 		level: config?.logger?.level
 	}).debug('Starting Robo...')
 
-	// Wait for states to be loaded
-	if (stateLoad) {
-		logger.debug('Waiting for state...')
-		await stateLoad
+	// Wanna shard? Delegate to the shard manager and await recursive call
+	if (shard && config.experimental?.disableBot !== true) {
+		discordLogger.debug('Sharding is enabled. Delegating start to shard manager...')
+		const { ShardingManager } = await import('discord.js')
+		const shardPath = typeof shard === 'string' ? shard : path.join(PackageDir, 'dist', 'cli', 'shard.js')
+		const options = typeof config.experimental?.shard === 'object' ? config.experimental.shard : {}
+		const manager = new ShardingManager(shardPath, { ...options, token: env('discord.token') })
+
+		manager.on('shardCreate', (shard) => discordLogger.debug(`Launched shard`, shard.id))
+		const result = await manager.spawn()
+		discordLogger.debug('Spawned', result.size, 'shard(s)')
+		return
 	}
 
-	// Load plugin options and start up Flashcore
-	const plugins = loadPluginData()
+	// Get ready for persistent data requests
 	await prepareFlashcore()
 
-	// Create the new client instance
-	client = optionsClient ?? new Client(config.clientOptions)
+	// Wait for states to be loaded
+	if (stateLoad) {
+		// Await external state promise if provided
+		logger.debug('Waiting for state...')
+		await stateLoad
+	} else {
+		// Load state directly otherwise
+		const stateStart = Date.now()
+		const state = await Flashcore.get<Record<string, unknown>>(FLASHCORE_KEYS.state)
+
+		if (state) {
+			loadState(state)
+		}
+		logger.debug(`State loaded in ${Date.now() - stateStart}ms`)
+	}
+
+	// Load plugin options
+	const plugins = loadPluginData()
+
+	// Create the new client instance (unless disabled)
+	if (config.experimental?.disableBot !== true) {
+		client = optionsClient ?? new Client(config.clientOptions)
+	} else {
+		logger.debug(`Bot is disabled, skipping client setup...`)
+	}
 
 	// Load the portal (commands, context, events)
-	portal = await Portal.open()
+	await Portal.open()
 
 	// Notify lifecycle event handlers
 	await executeEventHandler(plugins, '_start', client)
 
-	// Define event handlers
-	for (const key of portal.events.keys()) {
-		const onlyAuto = portal.events.get(key).every((event) => event.auto)
-		client.on(key, async (...args) => {
-			if (!onlyAuto) {
-				logger.event(`Event received: ${color.bold(key)}`)
-			}
-			logger.trace('Event args:', args)
+	if (config.experimental?.disableBot !== true) {
+		// Define event handlers
+		for (const key of portal.events.keys()) {
+			const onlyAuto = portal.events.get(key).every((event: HandlerRecord<Event>) => event.auto)
+			client.on(key, async (...args) => {
+				if (!onlyAuto) {
+					discordLogger.event(`Event received: ${color.bold(key)}`)
+				}
+				discordLogger.trace('Event args:', args)
 
-			// Notify event handler
-			executeEventHandler(plugins, key, ...args)
-		})
-	}
-
-	// Forward command interactions to our fancy handlers
-	client.on(Events.InteractionCreate, async (interaction) => {
-		if (interaction.isChatInputCommand()) {
-			const commandKey = getCommandKey(interaction)
-			logger.event(`Received slash command interaction: ${color.bold('/' + commandKey)}`)
-			logger.trace('Slash command interaction:', interaction.toJSON())
-			await executeCommandHandler(interaction, commandKey)
-		} else if (interaction.isAutocomplete()) {
-			const commandKey = getCommandKey(interaction)
-			logger.event(`Received autocomplete interaction for: ${color.bold(interaction.commandName)}`)
-			logger.trace('Autocomplete interaction:', interaction.toJSON())
-			await executeAutocompleteHandler(interaction, commandKey)
-		} else if (interaction.isContextMenuCommand()) {
-			logger.event(`Received context menu interaction: ${color.bold(interaction.commandName)}`)
-			logger.trace('Context menu interaction:', interaction.toJSON())
-			await executeContextHandler(interaction, interaction.commandName)
+				// Notify event handler
+				executeEventHandler(plugins, key, ...args)
+			})
 		}
-	})
 
-	// Log in to Discord with your client's token
-	await client.login(env.discord.token)
+		// Forward command interactions to our fancy handlers
+		client.on(Events.InteractionCreate, async (interaction) => {
+			if (interaction.isChatInputCommand()) {
+				const commandKey = getCommandKey(interaction)
+				discordLogger.event(`Received slash command interaction: ${color.bold('/' + commandKey)}`)
+				discordLogger.trace('Slash command interaction:', interaction.toJSON())
+				await executeCommandHandler(interaction, commandKey)
+			} else if (interaction.isAutocomplete()) {
+				const commandKey = getCommandKey(interaction)
+				discordLogger.event(`Received autocomplete interaction for: ${color.bold(interaction.commandName)}`)
+				discordLogger.trace('Autocomplete interaction:', interaction.toJSON())
+				await executeAutocompleteHandler(interaction, commandKey)
+			} else if (interaction.isContextMenuCommand()) {
+				discordLogger.event(`Received context menu interaction: ${color.bold(interaction.commandName)}`)
+				discordLogger.trace('Context menu interaction:', interaction.toJSON())
+				await executeContextHandler(interaction, interaction.commandName)
+			}
+		})
+
+		// Log in to Discord with your client's token
+		await client.login(env('discord.token'))
+	}
 }
 
 async function stop(exitCode = 0) {

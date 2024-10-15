@@ -1,8 +1,14 @@
-# Hiya, {{projectName}} ✨
+<p align="center">✨ <strong>Generated with <a href="https://roboplay.dev/create-robo">create-robo</a> magic!</strong> ✨</p>
 
-Welcome to your fresh **[Robo.js](https://github.com/Wave-Play/robo)** project! A Node framework for Discord.js bots, Robo.js handles boilerplate, automates command registration, simplifies Typescript support, and boasts "Sage" for easy interactions. Empowered by a dynamic plugin system, your robo thrives on RoboPlay or any Node-supporting host.
+---
 
-Let's get started on your journey to create the perfect Discord bot!
+# Hiya, {{projectName}} 🌈
+
+Welcome to your fresh **[Robo.js](https://github.com/Wave-Play/robo)** project!
+
+Embark on a journey where your Discord projects transcend the ordinary. With Robo.js as your guide, you'll experience a seamless, [file-based setup](https://docs.roboplay.dev/docs/basics/overview#the-robojs-file-structure), an [integrated database](https://docs.roboplay.dev/docs/basics/flashcore), [TypeScript support](https://docs.roboplay.dev/docs/advanced/typescript), and a multitude of [plugin-powered skills](https://docs.roboplay.dev/docs/advanced/plugins) to unlock along the way.
+
+Ready to embark on this adventure?
 
 ➞ [📚 **Documentation:** Getting started](https://docs.roboplay.dev/docs/getting-started)
 
@@ -10,19 +16,15 @@ Let's get started on your journey to create the perfect Discord bot!
 
 ## Running 🏃‍♂️
 
-To run your Robo, simply use the following command:
+Run development mode with:
 
 ```bash
-npx robo dev
+npm run dev
 ```
 
-No need to re-run when you make changes. Your Robo will automatically restart! 🔄
+Your Robo refreshes with every change. 🔄
 
-Ready to deploy and keep your Robo online at all times? It's as simple as:
-
-```bash
-npx robo deploy
-```
+> **Psst...** Check out the [deployment instructions](#deployment) to keep your Robo online 24/7.
 
 ## Developing 🏗️
 
@@ -65,10 +67,10 @@ The `.env` file contains your `DISCORD_TOKEN` and `DISCORD_CLIENT_ID`. Keep thes
 This Robo boasts an intuitive plugin system that grants new capabilities instantly!
 
 ```bash
-npx robo add @roboplay/plugin-ai
+npx robo add @robojs/ai
 ```
 
-> Swap out [`@roboplay/plugin-ai`](https://github.com/Wave-Play/robo.js/tree/main/packages/plugin-ai) with your chosen plugin's package name
+> Swap out [`@robojs/ai`](https://github.com/Wave-Play/robo.js/tree/main/packages/plugin-ai) with your chosen plugin's package name
 
 With that, your Robo automatically equips itself with all the features the plugin offers. Want to revert? Simply use [`robo remove`](https://docs.roboplay.dev/docs/advanced/command-line#plugins) to uninstall any plugin.
 
@@ -80,25 +82,25 @@ Crafting something unique in your Robo project? You can turn your innovations in
 
 ## Deployment 🚀
 
-Run the `robo deploy` command to automatically deploy to **[RoboPlay](https://roboplay.dev)** for free once you're ready to keep your robo online 24/7.
+Run the `deploy` command to automatically deploy to **[RoboPlay](https://roboplay.dev)** once you're ready to keep your robo online 24/7.
 
 ```bash
-npx robo deploy
+npm run deploy
 ```
 
 **➞** [🚀 **RoboPlay:** Hosting your Robo](https://docs.roboplay.dev/docs/hosting)
 
-You can also self-host your robo anywhere that supports Node. Just make sure to run `robo build` followed by `npm start` (alias for `robo start` here):
+You can also self-host your robo anywhere that supports Node. Just make sure to run `build` followed by `start`:
 
 ```bash
-npx robo build
+npm run build
 npm start
 ```
 
-You can also run `robo invite` (beta) to automatically generate a server invite to test it yourself or show it off! You can also use the **[Discord Developer Portal](https://discord.com/developers/applications)** to generate an invite as usual.
+You can also run `invite` (beta) to automatically generate a server invite to test it yourself or show it off! You can also use the **[Discord Developer Portal](https://discord.com/developers/applications)** to generate an invite as usual.
 
 ```bash
-npx robo invite
+npm run invite
 ```
 
 Happy coding! 🎉

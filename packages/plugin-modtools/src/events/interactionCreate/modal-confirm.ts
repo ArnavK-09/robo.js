@@ -1,6 +1,6 @@
 import { Modals, TextInputs } from '../../core/constants.js'
-import { getState, logger, setState } from '@roboplay/robo.js'
-import type { EventConfig } from '@roboplay/robo.js'
+import { getState, logger, setState } from 'robo.js'
+import type { EventConfig } from 'robo.js'
 import type { ModalSubmitInteraction } from 'discord.js'
 
 export const config: EventConfig = {
@@ -24,9 +24,10 @@ export default async (interaction: ModalSubmitInteraction) => {
 	}
 
 	// Get and validate confirmation callback
-	const { callback } = getState<{ callback: (interaction: ModalSubmitInteraction) => void }>('modal-confirm', {
-		namespace: interaction.guildId + interaction.user.id
-	}) ?? {}
+	const { callback } =
+		getState<{ callback: (interaction: ModalSubmitInteraction) => void }>('modal-confirm', {
+			namespace: interaction.guildId + interaction.user.id
+		}) ?? {}
 
 	if (!callback) {
 		console.log(`No callback found for guild ${interaction.guildId}`)

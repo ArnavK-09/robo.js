@@ -1,8 +1,8 @@
 import { BanData, Buttons, ID_NAMESPACE } from '../../core/constants.js'
 import { isBanned } from '../../core/utils.js'
-import { Flashcore } from '@roboplay/robo.js'
+import { Flashcore } from 'robo.js'
 import { ButtonStyle, Colors, ComponentType, PermissionFlagsBits } from 'discord.js'
-import type { CommandConfig, CommandResult } from '@roboplay/robo.js'
+import type { CommandConfig, CommandResult } from 'robo.js'
 import type { APIEmbed, CommandInteraction, Guild, GuildMember, User } from 'discord.js'
 
 export const config: CommandConfig = {
@@ -31,7 +31,7 @@ export default async (interaction: CommandInteraction): Promise<CommandResult> =
 	const isUserBanned = await isBanned(interaction.guild as Guild, user.id)
 
 	if (isUserBanned) {
-		status = 'Banned for: ' + banData?.reason ?? 'Unknown'
+		status = 'Banned for: ' + (banData?.reason ?? 'Unknown')
 	}
 	const infractions =
 		(await Flashcore.get<number>('infractions', {
@@ -48,7 +48,7 @@ export default async (interaction: CommandInteraction): Promise<CommandResult> =
 						type: ComponentType.Button,
 						style: ButtonStyle.Danger,
 						label: isUserBanned ? 'Unban' : 'Ban',
-						customId: (isUserBanned ? Buttons.Unban.id : Buttons.Ban.id ) + '/' + user.id
+						customId: (isUserBanned ? Buttons.Unban.id : Buttons.Ban.id) + '/' + user.id
 					}
 				]
 			}

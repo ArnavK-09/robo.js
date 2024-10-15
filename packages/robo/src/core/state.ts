@@ -1,12 +1,11 @@
 import { FLASHCORE_KEYS } from './constants.js'
 import { logger } from './logger.js'
 import { Flashcore } from './flashcore.js'
-import type { RoboMessage, RoboStateMessage } from '../types/index.js'
-import type { ChildProcess } from 'child_process'
 
 export const state: Record<string, unknown> = {}
 
 export interface GetStateOptions {
+	default?: unknown
 	namespace?: string
 }
 
@@ -138,36 +137,7 @@ export function getState<T = string>(key: string, options?: GetStateOptions): T 
 		key = `${options.namespace}__${key}`
 	}
 
-	return state[key] as T | null
-}
-
-export function getStateSave(botProcess: ChildProcess | null): Promise<Record<string, unknown>> {
-	if (!botProcess) {
-		return Promise.resolve({})
-	}
-
-	return new Promise((resolve, reject) => {
-		const messageListener = (message: RoboMessage) => {
-			// Check for the specific type of message we're waiting for
-			if (isStateMessage(message)) {
-				botProcess.off('message', messageListener)
-				resolve(message.state)
-			}
-		}
-
-		botProcess.on('message', messageListener)
-
-		botProcess.once('error', (error) => {
-			botProcess.off('message', messageListener)
-			reject(error)
-		})
-
-		botProcess.send({ type: 'state-save' })
-	})
-}
-
-function isStateMessage(message: RoboMessage): message is RoboStateMessage {
-	return message.type === 'state-load' || message.type === 'state-save'
+	return (state[key] ?? options?.default) as T | null
 }
 
 export function loadState(savedState: Record<string, unknown>) {
