@@ -1,16 +1,41 @@
-import { loadEnv } from './dotenv.js'
-loadEnv({ sync: true })
+// import { loadEnv } from './dotenv.js'
 
-export const env = {
+const Keys = {
 	discord: {
-		clientId: process.env.DISCORD_CLIENT_ID,
-		debugChannelId: process.env.DISCORD_DEBUG_CHANNEL_ID,
-		guildId: process.env.DISCORD_GUILD_ID,
-		token: process.env.DISCORD_TOKEN
+		clientId: 'DISCORD_CLIENT_ID',
+		debugChannelId: 'DISCORD_DEBUG_CHANNEL_ID',
+		guildId: 'DISCORD_GUILD_ID',
+		token: 'DISCORD_TOKEN'
 	},
-	nodeEnv: process.env.NODE_ENV,
+	nodeEnv: 'NODE_ENV',
 	roboplay: {
-		api: process.env.ROBOPLAY_API ?? 'https://api.roboplay.dev',
-		host: process.env.ROBOPLAY_HOST
+		api: {
+			key: 'ROBOPLAY_API',
+			default: 'https://api.roboplay.dev'
+		},
+		debug: 'ROBOPLAY_DEBUG',
+		env: 'ROBOPLAY_ENV',
+		frontend: {
+			key: 'ROBOPLAY_FRONTEND',
+			default: 'https://roboplay.dev'
+		}
 	}
+}
+
+export const env = (key: string): string => {
+	//loadEnv({ sync: true })
+	const keyParts = key.split('.')
+	
+	return keyParts.reduce((acc, k) => {
+		// @ts-expect-error - ...
+		const value = acc[k]
+
+		if (typeof value === 'object' && value.key) {
+			return process.env[value.key] || value.default
+		} else if (typeof value === 'object') {
+			return value
+		} else if (typeof value === 'string') {
+			return process.env[value]
+		}
+	}, Keys) as unknown as string
 }
