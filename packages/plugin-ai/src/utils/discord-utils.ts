@@ -1,15 +1,14 @@
-import { client } from '@roboplay/robo.js'
-import {
+import { ApplicationCommandType, CommandInteraction, InteractionType } from 'discord.js'
+import { client } from 'robo.js'
+import type {
 	APIInteraction,
 	APIMessage,
-	ApplicationCommandType,
-	CommandInteraction,
 	GuildMember,
 	GuildMemberFlags,
 	InteractionReplyOptions,
-	InteractionType,
 	Message,
-	TextBasedChannel
+	TextBasedChannel,
+	User
 } from 'discord.js'
 
 const CHAR_LIMIT = 2000
@@ -52,18 +51,19 @@ export function chunkMessage(message: string): string[] {
 }
 
 export function mockInteraction(
-	channel: TextBasedChannel | undefined,
+	channel: TextBasedChannel | null | undefined,
 	member: GuildMember | null | undefined,
 	args: Record<string, string>
 ) {
 	// Create a mock CommandInteraction to pass to the function handler
-	let interationMemberData = undefined
+	let interationMemberData: APIInteraction['member'] = undefined
 	if (member) {
 		interationMemberData = {
 			user: {
 				id: member.user.id,
 				username: member.user.username,
 				discriminator: member.user.discriminator,
+				global_name: member.user.username,
 				avatar: member.user.avatar
 			},
 			flags: (member?.flags ?? 0) as unknown as GuildMemberFlags,
@@ -91,6 +91,7 @@ export function mockInteraction(
 			name: 'mock',
 			id: 'mock'
 		},
+		entitlements: [],
 		guild_id: member?.guild?.id,
 		channel_id: channel?.id ?? '',
 		locale: 'en-US',
@@ -104,20 +105,58 @@ export function mockInteraction(
 	interaction.options = {
 		// @ts-expect-error - Mock
 		get(key: string) {
+			const val = args[key]
+
 			return {
-				value: args[key]
+				get channel() {
+					const result = member?.guild?.channels?.cache?.find((channel) => {
+						return channel.name === val
+					})
+
+					// logger.debug(`Got channel for "${key}" value "${val}"`, result)
+					return result
+				},
+
+				get member() {
+					const result = member?.guild?.members?.cache?.find((member) => {
+						return member.user.username === val?.replace('@', '')
+					})
+
+					// logger.debug(`Got member for "${key}" value "${val}"`, result)
+					return result
+				},
+
+				get role() {
+					const cleanValue = val.replace('@', '')
+					const result = member?.guild?.roles?.cache?.find((role) => {
+						return role.name === cleanValue
+					})
+
+					// logger.debug(`Got role for "${key}" value "${cleanValue}"`, result)
+					return result
+				},
+
+				get user() {
+					const result = member?.guild?.members?.cache?.find((member) => {
+						return member.user.username === val?.replace('@', '')
+					})?.user
+
+					// logger.debug(`Got user for "${key}" value "${val}"`, result)
+					return result
+				},
+
+				value: val
 			}
 		},
 
 		getMember: (key: string) => {
-			const userId = args[key].trim().replace(/\D/g, '')
+			const userId = args[key].trim().replace(/\D/g, '').replace('@', '')
 			return member?.guild?.members?.cache?.get(userId) ?? null
 		},
 
-		// @ts-expect-error - Mock
 		getUser: (key: string) => {
-			const userId = args[key].trim().replace(/\D/g, '')
-			return member?.guild?.members?.cache?.get(userId)?.user
+			const userId = args[key].trim().replace(/\D/g, '').replace('@', '')
+			return member?.guild?.members?.cache?.get(userId)?.user as User
 		}
 	}
 
@@ -142,7 +181,10 @@ export function mockInteraction(
 	return { interaction, replyPromise }
 }
 
-export function mockMessage(content: string | InteractionReplyOptions, channel: TextBasedChannel | undefined): Message {
+export function mockMessage(
+	content: string | InteractionReplyOptions,
+	channel: TextBasedChannel | null | undefined
+): Message {
 	const messageData: APIMessage = {
 		id: Date.now().toString(),
 		type: 0,
@@ -161,6 +203,7 @@ export function mockMessage(content: string | InteractionReplyOptions, channel: 
 			id: client.user?.id ?? 'mock',
 			username: client.user?.username ?? 'mock',
 			discriminator: client.user?.discriminator ?? '0',
+			global_name: client.user?.username ?? 'mock',
 			avatar: client.user?.avatar ?? 'mock'
 		}
 	}

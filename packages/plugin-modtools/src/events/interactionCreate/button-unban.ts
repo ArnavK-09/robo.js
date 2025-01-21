@@ -1,9 +1,9 @@
 import { Buttons, ID_NAMESPACE } from '../../core/constants.js'
 import { getSettings } from '../../core/settings.js'
 import { hasPermission, logAction } from '../../core/utils.js'
-import { Flashcore, logger } from '@roboplay/robo.js'
+import { Flashcore, logger } from 'robo.js'
 import { ButtonStyle, Colors, ComponentType } from 'discord.js'
-import type { EventConfig } from '@roboplay/robo.js'
+import type { EventConfig } from 'robo.js'
 import type { ButtonInteraction } from 'discord.js'
 
 export const config: EventConfig = {
@@ -56,14 +56,13 @@ export default async (interaction: ButtonInteraction) => {
 	// Log action to modlogs channel
 	if (interaction.channelId !== logsChannelId) {
 		const testPrefix = testMode ? '[TEST] ' : ''
+		const avatar = userAvatar ? { url: userAvatar } : undefined
 		logAction(interaction.guildId, {
 			embeds: [
 				{
 					title: testPrefix + `Unban`,
 					description: `User <@${userId}> has been unbanned`,
-					thumbnail: userAvatar ? {
-						url: userAvatar
-					} : undefined,
+					thumbnail: avatar,
 					color: Colors.Green,
 					timestamp: new Date().toISOString(),
 					footer: {

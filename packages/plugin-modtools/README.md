@@ -1,4 +1,4 @@
-# Enhanced Moderation Plugin
+# @robojs/moderation
 
 Tailored for Discord server management, this plugin includes a suite of commands essential for moderation. With enhanced features like anonymous warnings, attachment inclusion in reports, and comprehensive mod channel logs, it takes moderation to the next level.
 
@@ -11,13 +11,13 @@ Tailored for Discord server management, this plugin includes a suite of commands
 To add this plugin to your Robo.js project:
 
 ```bash
-npx robo add @roboplay/plugin-modtools
+npx robo add @robojs/moderation
 ```
 
 New to Robo.js? Start your project with this plugin pre-installed:
 
 ```bash
-npx create-robo <project-name> -p @roboplay/plugin-modtools
+npx create-robo <project-name> -p @robojs/moderation
 ```
 
 ## Slash Commands
@@ -34,6 +34,10 @@ Utilize these commands for efficient moderation:
 | `/mod setup`   | Initiate and configure your moderation setup.                 |
 | `/mod timeout` | Impose timeouts on members for cooling-off periods.           |
 | `/mod warn`    | Issue warnings to members, adding to their strike count.      |
+| `/mod rules-msg set-rules`    | brings up a modal to add in the embed title, rules(description) and an image url.      |
+| `/mod rules-msg set-member-role`    | set the role of members in the guild, they cant send messages with out this role but they earn this role from the rules accept button. |
+| `/mod rules-msg send`    | sends the rules message with the i accept button to the channel where used.      |
+
 
 ## Context Commands
 
@@ -49,6 +53,7 @@ Enhance user experience with context-specific commands:
 Moderation channels are dedicated spaces for tracking and managing server activities:
 
 <!-- - **Audit Logs**: Comprehensive records of user interactions and changes. -->
+
 - **Moderator Logs**: Detailed logs of every moderation action taken.
 - **Moderator Mail**: Central hub for receiving and managing user reports.
 
@@ -63,12 +68,23 @@ Once you add the plugin, run the `/mod setup` command as a moderator to configur
 
 ## AI Integration
 
-> *"**@SageBot** please ban **@Baguette** for spamming bread"*
+> _"**@SageBot** please ban **@Baguette** for spamming bread"_
 
-Integrate with [`@roboplay/plugin-ai`](https://github.com/Wave-Play/robo.js/tree/main/packages/plugin-ai) to experience the next level of moderation. Use natural language for commands and watch your Robo execute them with AI's understanding.
+Integrate with [`@robojs/ai`](https://github.com/Wave-Play/robo.js/tree/main/packages/plugin-ai) to experience the next level of moderation. Use natural language for commands and watch your Robo execute them with AI's understanding.
 
 ```bash
-npx robo add @roboplay/plugin-ai
+npx robo add @robojs/ai
+```
+
+## Automatic Poll Deletion
+
+Don't like poll spam? Enable automatic poll deletion to keep your server clean and organized.
+
+```js
+// config/plugins/robojs/moderation.mjs
+export default {
+	deletePolls: true
+}
 ```
 
 ## Starting Your Robo.js Journey

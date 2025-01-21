@@ -5,8 +5,8 @@ import { color, composeColors } from '../core/color.js'
 import { logger } from '../core/logger.js'
 import { checkSageUpdates, getPackageManager } from '../core/utils.js'
 
-import { loadEnv } from '@roboplay/robo.js/dist/core/dotenv.js'
-import { loadConfig } from '@roboplay/robo.js/dist/core/config.js'
+import { Env } from 'robo.js/dist/core/env.js'
+import { loadConfig } from 'robo.js/dist/core/config.js'
 
 const command = new Command('doctor')
 	.description('Checks if your Robo is healthy')
@@ -31,8 +31,8 @@ async function doctorAction(options: DoctorOptions) {
 	if (options.selfCheck) {
 		await checkSageUpdates()
 	}
-	
-	loadEnv({ sync: true })
+
+	Env.loadSync()
 	const config = await loadConfig()
 
 	// Group and run checks

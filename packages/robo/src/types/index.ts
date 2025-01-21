@@ -1,3 +1,5 @@
+import type { CommandContext, CommandIntegrationType } from './commands.js'
+
 export * from './api.js'
 export * from './commands.js'
 export * from './config.js'
@@ -5,8 +7,11 @@ export * from './events.js'
 export * from './manifest.js'
 
 export interface ContextConfig extends BaseConfig {
+	contexts?: CommandContext[]
 	defaultMemberPermissions?: string | number | bigint
+	/** @deprecated Use `contexts` instead */
 	dmPermission?: boolean
+	integrationTypes?: CommandIntegrationType[]
 	nameLocalizations?: Record<string, string>
 	sage?: false | SageOptions
 	timeout?: number
@@ -24,6 +29,7 @@ export interface FlashcoreAdapter<K = string, V = unknown> {
 	delete(key: K): Promise<boolean> | boolean
 	get(key: K): Promise<V | undefined> | V | undefined
 	set(key: K, value: V): Promise<boolean> | boolean
+	has(key: K): Promise<boolean> | boolean
 }
 
 export interface HandlerRecord<T = unknown> {
@@ -55,6 +61,25 @@ export interface Middleware {
 
 export type MiddlewareEntry = BaseConfig
 
+export interface PackageJson {
+	name: string
+	version: string
+	description?: string
+	scripts?: Record<string, string>
+	dependencies?: Record<string, string>
+	devDependencies?: Record<string, string>
+	main?: string
+	types?: string
+	engines?: {
+		node?: string
+		npm?: string
+	}
+	repository?: {
+		type: string
+		url: string
+	}
+}
+
 export interface RoboMessage {
 	type: 'ready' | 'restart' | 'state-load' | 'state-save'
 }
@@ -65,15 +90,7 @@ export interface RoboStateMessage extends RoboMessage {
 
 export interface SpiritMessage {
 	error?: unknown
-	event?:
-		| 'build'
-		| 'get-state'
-		| 'command'
-		| 'ready'
-		| 'restart'
-		| 'set-state'
-		| 'start'
-		| 'stop'
+	event?: 'build' | 'get-state' | 'command' | 'ready' | 'restart' | 'set-state' | 'start' | 'stop'
 	payload?: unknown
 	state?: Record<string, unknown>
 	verbose?: boolean
@@ -111,3 +128,5 @@ export interface BaseConfig {
 	description?: string
 	timeout?: number
 }
+
+export default {}

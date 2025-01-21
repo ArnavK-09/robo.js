@@ -30,9 +30,11 @@
       "plugins": [],
       "type": "plugin"
     },
+    "language": "typescript",
+    "mode": "production",
     "type": "plugin",
-    "updatedAt": "2023-11-24T22:47:04.587Z",
-    "version": "0.9.10"
+    "updatedAt": "2024-11-13T04:29:27.573Z",
+    "version": "0.10.24"
   },
   "api": {},
   "commands": {
@@ -49,6 +51,35 @@
               "description": "The user to audit",
               "required": true,
               "type": "user"
+            }
+          ]
+        },
+        "kick": {
+          "__path": "/.robo/build/commands/mod/kick.js",
+          "defaultMemberPermissions": "2n",
+          "description": "Kick a member from the server",
+          "dmPermission": false,
+          "options": [
+            {
+              "name": "member",
+              "description": "The @member to kick",
+              "required": true,
+              "type": "user"
+            },
+            {
+              "name": "reason",
+              "description": "The reason for the kick",
+              "type": "string"
+            },
+            {
+              "name": "delete_messages",
+              "autocomplete": true,
+              "description": "How much of their recent message history to delete"
+            },
+            {
+              "name": "anonymous",
+              "description": "Whether to execute the kick anonymously",
+              "type": "boolean"
             }
           ]
         },
@@ -86,31 +117,25 @@
             }
           ]
         },
-        "kick": {
-          "__path": "/.robo/build/commands/mod/kick.js",
-          "defaultMemberPermissions": "2n",
-          "description": "Kick a member from the server",
+        "forgive": {
+          "__path": "/.robo/build/commands/mod/forgive.js",
+          "defaultMemberPermissions": "1099511627776n",
+          "description": "Forgive a member and clear their strikes",
           "dmPermission": false,
           "options": [
             {
               "name": "member",
-              "description": "The @member to kick",
+              "description": "The @member to forgive",
               "required": true,
               "type": "user"
             },
             {
               "name": "reason",
-              "description": "The reason for the kick",
-              "type": "string"
-            },
-            {
-              "name": "delete_messages",
-              "autocomplete": true,
-              "description": "How much of their recent message history to delete"
+              "description": "The reason for forgiving the member"
             },
             {
               "name": "anonymous",
-              "description": "Whether to execute the kick anonymously",
+              "description": "Whether to send the warning anonymously",
               "type": "boolean"
             }
           ]
@@ -121,32 +146,31 @@
           "description": "Sets up the moderation tools for the server",
           "dmPermission": false
         },
-        "report": {
-          "__path": "/.robo/build/commands/mod/report.js",
-          "description": "Report a member for something",
+        "warn": {
+          "__path": "/.robo/build/commands/mod/warn.js",
+          "defaultMemberPermissions": "1099511627776n",
+          "description": "Warns a member and adds a strike",
           "dmPermission": false,
           "options": [
             {
               "name": "member",
-              "description": "The @member to report",
+              "description": "The @member to warn",
               "required": true,
               "type": "user"
             },
             {
               "name": "reason",
-              "description": "The reason for the report",
-              "required": true,
-              "type": "string"
+              "description": "The reason for the warn",
+              "required": true
+            },
+            {
+              "name": "message",
+              "description": "The message ID that triggered the warn"
             },
             {
               "name": "anonymous",
-              "description": "Hides your identity from the report, even to moderators",
+              "description": "Whether to send the warning anonymously",
               "type": "boolean"
-            },
-            {
-              "name": "evidence",
-              "description": "Evidence to support the report",
-              "type": "attachment"
             }
           ]
         },
@@ -200,56 +224,65 @@
             }
           ]
         },
-        "forgive": {
-          "__path": "/.robo/build/commands/mod/forgive.js",
-          "defaultMemberPermissions": "1099511627776n",
-          "description": "Forgive a member and clear their strikes",
+        "report": {
+          "__path": "/.robo/build/commands/mod/report.js",
+          "description": "Report a member for something",
           "dmPermission": false,
           "options": [
             {
               "name": "member",
-              "description": "The @member to forgive",
+              "description": "The @member to report",
               "required": true,
               "type": "user"
             },
             {
               "name": "reason",
-              "description": "The reason for forgiving the member"
+              "description": "The reason for the report",
+              "required": true,
+              "type": "string"
             },
             {
               "name": "anonymous",
-              "description": "Whether to send the warning anonymously",
+              "description": "Hides your identity from the report, even to moderators",
               "type": "boolean"
+            },
+            {
+              "name": "evidence",
+              "description": "Evidence to support the report",
+              "type": "attachment"
             }
           ]
         },
-        "warn": {
-          "__path": "/.robo/build/commands/mod/warn.js",
-          "defaultMemberPermissions": "1099511627776n",
-          "description": "Warns a member and adds a strike",
-          "dmPermission": false,
-          "options": [
-            {
-              "name": "member",
-              "description": "The @member to warn",
-              "required": true,
-              "type": "user"
+        "rules-msg": {
+          "subcommands": {
+            "send": {
+              "__path": "/.robo/build/commands/mod/rules-msg/send.js",
+              "description": "Sends the Rules message with IAccept button to the channel where used",
+              "options": [
+                {
+                  "name": "button-text",
+                  "description": "The text on the button",
+                  "type": "string"
+                }
+              ]
             },
-            {
-              "name": "reason",
-              "description": "The reason for the warn",
-              "required": true
+            "set-rules": {
+              "__path": "/.robo/build/commands/mod/rules-msg/set-rules.js",
+              "description": "Set the forum channel in which modmail will send the mails."
             },
-            {
-              "name": "message",
-              "description": "The message ID that triggered the warn"
-            },
-            {
-              "name": "anonymous",
-              "description": "Whether to send the warning anonymously",
-              "type": "boolean"
+            "set-member-role": {
+              "__path": "/.robo/build/commands/mod/rules-msg/set-member-role.js",
+              "description": "set the role members will be given afte accepting the rules",
+              "options": [
+                {
+                  "name": "role",
+                  "description": "select the role people will get from the rules button",
+                  "required": true,
+                  "type": "role"
+                }
+              ]
             }
-          ]
+          }
         }
       }
     }
@@ -269,9 +302,22 @@
     }
   },
   "events": {
+    "_start": [
+      {
+        "__path": "/.robo/build/events/_start.js"
+      }
+    ],
     "interactionCreate": [
       {
         "__path": "/.robo/build/events/interactionCreate/button-ban.js",
+        "frequency": "always"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/button-setup-lockdownmode.js",
+        "frequency": "always"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/button-setup-requireconfirmation.js",
         "frequency": "always"
       },
       {
@@ -279,7 +325,29 @@
         "frequency": "always"
       },
       {
-        "__path": "/.robo/build/events/interactionCreate/button-setup-requireconfirmation.js",
+        "__path": "/.robo/build/events/interactionCreate/button-setup-testmode.js",
+        "frequency": "always"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/modal-confirm.js",
+        "frequency": "always"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/buttons-accept-rules.js"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/modal-set-rules.js"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/modal-report-message.js",
+        "frequency": "always"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/select-setup-audit.js",
+        "frequency": "always"
+      },
+      {
+        "__path": "/.robo/build/events/interactionCreate/select-modchannel-roles.js",
         "frequency": "always"
       },
       {
@@ -291,30 +359,15 @@
         "frequency": "always"
       },
       {
-        "__path": "/.robo/build/events/interactionCreate/button-setup-testmode.js",
-        "frequency": "always"
-      },
-      {
-        "__path": "/.robo/build/events/interactionCreate/modal-report-message.js",
-        "frequency": "always"
-      },
-      {
-        "__path": "/.robo/build/events/interactionCreate/select-modchannel-roles.js",
-        "frequency": "always"
-      },
-      {
-        "__path": "/.robo/build/events/interactionCreate/modal-confirm.js",
-        "frequency": "always"
-      },
-      {
-        "__path": "/.robo/build/events/interactionCreate/select-setup-audit.js",
-        "frequency": "always"
-      },
-      {
         "__path": "/.robo/build/events/interactionCreate/select-setup-logs.js"
       },
       {
         "__path": "/.robo/build/events/interactionCreate/select-setup-mail.js"
+      }
+    ],
+    "messageCreate": [
+      {
+        "__path": "/.robo/build/events/messageCreate/user-not-accepted-rules.js"
       }
     ]
   },
@@ -328,7 +381,11 @@
     "ViewAuditLog",
     "ViewChannel"
   ],
-  "middleware": [],
+  "middleware": [
+    {
+      "__path": "/.robo/build/middleware/lockdown.js"
+    }
+  ],
   "scopes": [
     "applications.commands",
     "bot"

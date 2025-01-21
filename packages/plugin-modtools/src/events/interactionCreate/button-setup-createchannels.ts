@@ -2,9 +2,9 @@ import { createSetupMessage } from '../../commands/mod/setup.js'
 import { Buttons, Selects } from '../../core/constants.js'
 import { hasPermission, logAction } from '../../core/utils.js'
 import { getSettings, updateSettings } from '../../core/settings.js'
-import { client, logger, setState } from '@roboplay/robo.js'
+import { client, logger, setState } from 'robo.js'
 import { ChannelType, PermissionFlagsBits, Colors, ComponentType } from 'discord.js'
-import type { EventConfig } from '@roboplay/robo.js'
+import type { EventConfig } from 'robo.js'
 import type { BaseInteraction, ButtonInteraction, Guild, OverwriteResolvable } from 'discord.js'
 
 export const config: EventConfig = {
@@ -70,7 +70,9 @@ export default async (interaction: ButtonInteraction) => {
 
 	// Send confirmation
 	await interaction.followUp({
-		content: `Missing moderator channels have been created!\n${channelsCreated.join('\n')}\n\nYou should update channel permissions to allow your moderators to view them, or you can select them below.`,
+		content: `Missing moderator channels have been created!\n${channelsCreated.join(
+			'\n'
+		)}\n\nYou should update channel permissions to allow your moderators to view them, or you can select them below.`,
 		ephemeral: true,
 		components: [
 			{

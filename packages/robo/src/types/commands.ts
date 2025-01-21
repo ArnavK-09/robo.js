@@ -1,9 +1,16 @@
 import type {
 	ApplicationCommandOptionChoiceData,
+	ApplicationIntegrationType,
+	Attachment,
 	AutocompleteInteraction,
 	CommandInteraction,
+	GuildBasedChannel,
+	GuildMember,
+	InteractionContextType,
 	InteractionReplyOptions,
-	MessagePayload
+	MessagePayload,
+	Role,
+	User
 } from 'discord.js'
 import type { BaseConfig, SageOptions } from './index.js'
 
@@ -12,22 +19,29 @@ export interface Command {
 		interaction: AutocompleteInteraction
 	) => Promise<ApplicationCommandOptionChoiceData<string | number>[]>
 	config?: CommandConfig
-	default: (interaction: CommandInteraction) => unknown | Promise<unknown>
+	default: (interaction: CommandInteraction, options: unknown) => unknown | Promise<unknown>
 }
 
 export interface CommandConfig extends BaseConfig {
+	contexts?: CommandContext[]
 	defaultMemberPermissions?: string | number | bigint
+	/** @deprecated Use `contexts` instead */
 	dmPermission?: boolean
 	descriptionLocalizations?: Record<string, string>
+	integrationTypes?: CommandIntegrationType[]
 	nameLocalizations?: Record<string, string>
-	options?: CommandOption[]
+	options?: readonly CommandOption[]
 	sage?: false | SageOptions
 	timeout?: number
 }
 
+export type CommandContext = 'BotDM' | 'Guild' | 'PrivateChannel' | InteractionContextType
+
 export interface CommandEntry extends CommandConfig {
 	subcommands?: Record<string, CommandEntry>
 }
+
+export type CommandIntegrationType = 'GuildInstall' | 'UserInstall' | ApplicationIntegrationType
 
 export interface CommandOption {
 	autocomplete?: boolean
@@ -39,7 +53,36 @@ export interface CommandOption {
 	name: string
 	nameLocalizations?: Record<string, string>
 	required?: boolean
-	type?: 'string' | 'integer' | 'number' | 'boolean' | 'channel' | 'attachment' | 'role' | 'user' | 'mention'
+	type?: keyof CommandOptionTypes
 }
 
 export type CommandResult = string | InteractionReplyOptions | MessagePayload | void
+
+export type CommandOptionTypes = {
+	string: string
+	integer: number
+	number: number
+	boolean: boolean
+	user: User
+	channel: GuildBasedChannel
+	member: GuildMember
+	role: Role
+	attachment: Attachment
+	mention: GuildMember | Role
+}
+
+export type CommandOptions<ConfigType extends CommandConfig> = {
+	[K in NonNullable<ConfigType['options']>[number] as K['name']]: K extends { required: true; type: infer TypeName }
+		? TypeName extends keyof CommandOptionTypes
+			? CommandOptionTypes[TypeName]
+			: string
+		: K extends { type: infer TypeName }
+		? TypeName extends keyof CommandOptionTypes
+			? CommandOptionTypes[TypeName] | undefined
+			: string | undefined
+		: K extends { required: true }
+		? string
+		: string | undefined
+}
+
+export default {}
